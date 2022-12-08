@@ -3,23 +3,21 @@ package hu.webuni.catalogservice.web;
 
 import com.querydsl.core.types.Predicate;
 import hu.webuni.catalogservice.dto.ProductDTO;
+import hu.webuni.catalogservice.dto.ProductHistoryDTOWrapper;
+import hu.webuni.catalogservice.dto.ProductHistoryWrapper;
 import hu.webuni.catalogservice.mapper.ProductMapper;
 import hu.webuni.catalogservice.model.Product;
 import hu.webuni.catalogservice.service.ProductService;
+import hu.webuni.catalogservice.service.utility.ProductUtility;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.MethodParameter;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.querydsl.binding.QuerydslPredicate;
-import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
-import org.springframework.data.web.SortDefault;
-import org.springframework.data.web.querydsl.QuerydslPredicateArgumentResolver;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.NativeWebRequest;
 
-import java.lang.reflect.Method;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -29,11 +27,9 @@ public class ProductController {
 
     private final ProductService productService;
     private final ProductMapper productMapper;
-
     private final NativeWebRequest nativeWebRequest;
-    private final PageableHandlerMethodArgumentResolver pageableHandlerMethodArgumentResolver;
-    private final QuerydslPredicateArgumentResolver querydslPredicateArgumentResolver;
 
+    private final ProductUtility productUtility;
 
     @PostMapping("/create")
     public ProductDTO createProduct(@RequestBody ProductDTO productDTO) {
@@ -63,39 +59,26 @@ public class ProductController {
 
     @GetMapping("/list")
     public ResponseEntity<List<ProductDTO>> getAllProducts(Integer page, Integer size, String sort, Long id, String name, Long price, String categoryName) {
-        Pageable pageable = getPageable("configPageable",0);
-        Predicate predicate = getPredicate("configPredicate",0);
+        Pageable pageable = productUtility.getPageable("configPageable",0,nativeWebRequest);
+        Predicate predicate = productUtility.getPredicate("configPredicate",0,nativeWebRequest);
         return ResponseEntity.ok(productMapper.toProductDTOList(productService.getCourses(predicate,pageable)));
     }
 
-    private Predicate getPredicate(String methodName, int paramIndex) {
+       @GetMapping("/{id}/history")
+    public List<ProductHistoryDTOWrapper> getProductHistoryById(@PathVariable("id") Long id){
 
-        Method method = null;
-        try {
-            method = this.getClass().getMethod(methodName, Predicate.class);
-            MethodParameter methodParameter= new MethodParameter(method,paramIndex);
-            return (Predicate) querydslPredicateArgumentResolver.resolveArgument(methodParameter,null,nativeWebRequest,null);
+        return productService.getHistoryOfProductWithId(id).stream().map(
+                    item -> {
+                        ProductHistoryDTOWrapper mapped = new ProductHistoryDTOWrapper(
+                                productMapper.toProductDTO(item.getProduct()),
+                                item.getRevEntity(),
+                                item.getRevType()
+                        );
+                        return mapped;
+                    }
+            ).collect(Collectors.toList());
 
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
     }
-
-    private Pageable getPageable(String methodName,int paramIndex) {
-        Method method = null;
-        try {
-            method = this.getClass().getMethod(methodName, Pageable.class);
-        } catch (NoSuchMethodException e) {
-            throw new RuntimeException(e);
-        }
-        MethodParameter methodParameter= new MethodParameter(method,paramIndex);
-        Pageable pageable=pageableHandlerMethodArgumentResolver.resolveArgument(methodParameter,null,nativeWebRequest,null);
-        return pageable;
-    }
-
-    public void configPageable(@SortDefault("id") Pageable pageable){}
-
-    public void configPredicate(@QuerydslPredicate(root = Product.class) Predicate predicate){}
 
 
 }

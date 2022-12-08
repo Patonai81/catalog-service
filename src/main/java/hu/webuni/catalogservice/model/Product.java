@@ -1,10 +1,11 @@
 package hu.webuni.catalogservice.model;
 
 import lombok.*;
-import org.hibernate.annotations.Cascade;
+import org.hibernate.envers.Audited;
 
 import javax.persistence.*;
 
+@Audited
 @AllArgsConstructor
 @RequiredArgsConstructor
 @Builder
@@ -19,6 +20,7 @@ public class Product {
     private  String name;
     private Long price;
 
+    @ToString.Exclude
     @ManyToOne(cascade = {CascadeType.PERSIST,CascadeType.REMOVE})
     private Category category;
 
