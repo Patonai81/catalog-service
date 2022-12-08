@@ -1,12 +1,17 @@
 package hu.webuni.catalogservice.web;
 
+import com.querydsl.core.types.Predicate;
 import hu.webuni.catalogservice.dto.CategoryDTO;
+import hu.webuni.catalogservice.dto.ProductDTO;
 import hu.webuni.catalogservice.mapper.CategoryMapper;
 import hu.webuni.catalogservice.service.CategoryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Set;
 
 @Slf4j
@@ -35,4 +40,4 @@ public class CategoryController {
         categoryService.deleteCategory(name);
     }
 
-    }
+}

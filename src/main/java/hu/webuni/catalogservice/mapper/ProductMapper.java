@@ -7,8 +7,12 @@ import hu.webuni.catalogservice.model.Product;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
+import java.util.List;
+
 @Mapper(componentModel = "spring")
 public interface ProductMapper {
+
+    List<ProductDTO> toProductDTOList(List<Product> product);
 
     ProductDTO toProductDTO(Product product);
 
