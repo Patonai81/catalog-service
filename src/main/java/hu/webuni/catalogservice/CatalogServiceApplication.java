@@ -18,16 +18,14 @@ public class CatalogServiceApplication {
 
     public static void main2(String[] args) {
         JSONObject json = new JSONObject();
-        HashSet<ProductDTO> productDTOS = new HashSet<>();
         ProductDTO productDTO = new ProductDTO();
         CategoryDTO categoryDTO = new CategoryDTO();
         categoryDTO.setName("mycategory");
 
        productDTO.setCategory(categoryDTO);
         productDTO.setName("productname");
-       productDTOS.add(productDTO);
 
-        json.put("set", productDTOS);
+        json.put("product", productDTO);
       //  json.put("list", Arrays.asList("a", "b"));
         String jsonString = json.toString();
 

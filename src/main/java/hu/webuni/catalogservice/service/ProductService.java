@@ -18,8 +18,12 @@ public class ProductService {
 
     @Transactional(Transactional.TxType.REQUIRED)
     public Product createProduct(Product product){
-        return productRepository.save(product);
+       Product saved= productRepository.save(product);
+       Category category= categoryService.createCategoryIfNotPresent(product.getCategory());
+       saved.setCategory(category);
+       return saved;
     }
+
 
     @Transactional(Transactional.TxType.REQUIRED)
     public Product deleteProduct(Long id) {
@@ -44,19 +48,15 @@ public class ProductService {
     @Transactional(Transactional.TxType.REQUIRED)
     public void modifyProduct(Product product) {
 
-        Product currentRecord = productRepository.findByNameIgnoreCase(product.getName()).get();
-        if (product.getCategory()!= null) {
-            String categoryName = product.getCategory().getName();
-            Optional<Category> category=categoryService.findCategory(categoryName);
-            if (!category.isPresent())
-            {
-                Category category1 = categoryService.createCategory(product.getCategory());
-                product.setCategory(category1);
-            }
+        Product currentRecord = productRepository.findById(product.getId()).get();
+        currentRecord.setPrice(product.getPrice());
+        currentRecord.setName(product.getName());
+        if (!product.getCategory().getName().equals(currentRecord.getCategory().getName())){
+            Category category = categoryService.createCategoryIfNotPresent(product.getCategory());
+            currentRecord.setCategory(category);
         }
-
-        productRepository.save(product);
     }
+
 
     @Transactional(Transactional.TxType.REQUIRED)
     public Category addProductToCategory(String categoryName, Long productId){
@@ -66,7 +66,7 @@ public class ProductService {
         if (!categoryOptional.isPresent()){
             category = new Category();
             category.setName(categoryName);
-            category= categoryService.createCategory(category);
+            category= categoryService.createCategoryIfNotPresent(category);
         }else {
             category=categoryOptional.get();
         }

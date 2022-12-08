@@ -22,7 +22,7 @@ public class CategoryController {
     @PostMapping("/create")
     public CategoryDTO createCategory(@RequestBody CategoryDTO categoryDTO) {
       log.info(categoryDTO.toString());
-      return categoryMapper.toCategoryDTO(categoryService.createCategory(categoryMapper.toCategory(categoryDTO)));
+      return categoryMapper.toCategoryDTO(categoryService.createCategoryIfNotPresent(categoryMapper.toCategory(categoryDTO)));
     }
 
     @GetMapping("/list")

@@ -1,9 +1,7 @@
 package hu.webuni.catalogservice.service;
 
 import hu.webuni.catalogservice.model.Category;
-import hu.webuni.catalogservice.model.Product;
 import hu.webuni.catalogservice.repository.CategoryRepository;
-import hu.webuni.catalogservice.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,8 +17,18 @@ public class CategoryService {
     private final CategoryRepository categoryRepository;
 
     @Transactional(Transactional.TxType.REQUIRED)
-    public Category createCategory(Category category) {
-    return categoryRepository.save(category);
+    public Category createCategoryIfNotPresent(Category categoryInput) {
+        Optional<Category> categoryOptional = findCategory(categoryInput.getName());
+        Category category=null;
+
+        if (!categoryOptional.isPresent()){
+            category = new Category();
+            category.setName(categoryInput.getName());
+            category= categoryRepository.save(category);
+        }else {
+            category=categoryOptional.get();
+        }
+        return category;
     }
 
     @Transactional(Transactional.TxType.REQUIRED)
