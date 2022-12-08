@@ -1,6 +1,7 @@
 package hu.webuni.catalogservice.model;
 
 import lombok.*;
+import org.hibernate.annotations.Cascade;
 
 import javax.persistence.*;
 
@@ -18,7 +19,7 @@ public class Product {
     private  String name;
     private Long price;
 
-    @ManyToOne
+    @ManyToOne(cascade = {CascadeType.PERSIST,CascadeType.REMOVE})
     private Category category;
 
 

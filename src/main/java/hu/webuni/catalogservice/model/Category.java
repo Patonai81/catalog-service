@@ -19,7 +19,7 @@ public class Category {
     private String name;
 
 
-    @OneToMany(mappedBy = "category",cascade = CascadeType.REMOVE, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "category",cascade = CascadeType.ALL,orphanRemoval = true, fetch = FetchType.EAGER)
     @EqualsAndHashCode.Exclude
     private Set<Product> products= new HashSet<>();
 
