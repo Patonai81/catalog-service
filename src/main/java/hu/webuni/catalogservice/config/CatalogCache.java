@@ -1,14 +1,7 @@
 package hu.webuni.catalogservice.config;
 
 import lombok.RequiredArgsConstructor;
-import org.infinispan.configuration.cache.CacheMode;
-import org.infinispan.configuration.cache.ConfigurationBuilder;
-import org.infinispan.eviction.EvictionType;
-import org.infinispan.manager.EmbeddedCacheManager;
-import org.infinispan.spring.starter.embedded.InfinispanCacheConfigurer;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.EnableCaching;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @RequiredArgsConstructor
