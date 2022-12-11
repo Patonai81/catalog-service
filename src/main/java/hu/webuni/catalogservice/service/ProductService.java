@@ -30,11 +30,16 @@ import java.util.stream.Collectors;
 public class ProductService {
 
     private final ProductRepository productRepository;
-    private final CategoryRepository categoryRepository;
     private final CategoryService categoryService;
 
     @PersistenceContext
     private EntityManager entityManager;
+
+    public Product findProduct(Long id) {
+        Optional<Product> optionalProduct = productRepository.findById(id);
+        return  optionalProduct.orElse(null);
+    }
+
 
     @Transactional(Transactional.TxType.REQUIRED)
     public Product createProduct(Product product){
