@@ -1,43 +1,51 @@
 package hu.webuni.catalogservice.web;
 
-import com.querydsl.core.types.Predicate;
-import hu.webuni.catalogservice.dto.CategoryDTO;
-import hu.webuni.catalogservice.dto.ProductDTO;
 import hu.webuni.catalogservice.mapper.CategoryMapper;
+import hu.webuni.catalogservice.model.CategoryDTO;
 import hu.webuni.catalogservice.service.CategoryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.context.request.NativeWebRequest;
 
 import java.util.List;
-import java.util.Set;
+import java.util.Optional;
 
 @Slf4j
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/catalog")
-public class CategoryController {
+public class CategoryController implements CategoryControllerApi{
 
+    private final NativeWebRequest nativeWebRequest;
     private final CategoryService categoryService;
-
     private final CategoryMapper categoryMapper;
 
-    @PostMapping("/create")
-    public CategoryDTO createCategory(@RequestBody CategoryDTO categoryDTO) {
-      log.info(categoryDTO.toString());
-      return categoryMapper.toCategoryDTO(categoryService.createCategoryIfNotPresent(categoryMapper.toCategory(categoryDTO)));
+    @Override
+    public Optional<NativeWebRequest> getRequest() {
+        return Optional.of(nativeWebRequest);
     }
 
-    @GetMapping("/list")
-    public Set<CategoryDTO> listCategory() {
-      return categoryMapper.toCategoryDTOSet(categoryService.findAll());
+    @Override
+    public ResponseEntity<CategoryDTO> createCategory(CategoryDTO categoryDTO) {
+        log.info(categoryDTO.toString());
+
+        CategoryDTO result = categoryMapper.toCategoryDTO(categoryService.createCategoryIfNotPresent(categoryMapper.toCategory(categoryDTO)));
+        log.info("Result is: "+result);
+        return ResponseEntity.ok(result);
     }
 
-    @DeleteMapping("/delete/{name}")
-    public void deleteCategory(@PathVariable String name) {
+    @Override
+    public ResponseEntity<Void> deleteCategory(String name) {
         categoryService.deleteCategory(name);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
+
+    @Override
+    public ResponseEntity<List<CategoryDTO>> listCategory() {
+        return ResponseEntity.ok(categoryMapper.toCategoryDTOSet(categoryService.findAll()).stream().toList());
+    }
+
 
 }

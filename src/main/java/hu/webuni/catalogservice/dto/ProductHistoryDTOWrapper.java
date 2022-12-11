@@ -1,6 +1,5 @@
 package hu.webuni.catalogservice.dto;
 
-import hu.webuni.catalogservice.model.Product;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.ToString;
@@ -13,7 +12,7 @@ import org.hibernate.envers.RevisionType;
 @ToString
 public class ProductHistoryDTOWrapper {
 
-    ProductDTO course;
+    ProductDTO productDTO;
     DefaultRevisionEntity revEntity;
     RevisionType revType;
 }

@@ -1,0 +1,242 @@
+openapi: 3.0.1
+info:
+  title: OpenAPI definition
+  version: v0
+servers:
+- url: http://localhost:8081
+  description: Generated server url
+paths:
+  /api/product/modify/{id}:
+    put:
+      tags:
+      - product-controller
+      operationId: modifyProduct
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductDTO'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductDTO'
+  /api/product/create:
+    post:
+      tags:
+      - product-controller
+      operationId: createProduct
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductDTO'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductDTO'
+  /api/catalog/create:
+    post:
+      tags:
+      - category-controller
+      operationId: createCategory
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CategoryDTO'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryDTO'
+  /api/product/{id}/history:
+    get:
+      tags:
+      - product-controller
+      operationId: getProductHistoryById
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProductHistoryDTOWrapper'
+  /api/product/list:
+    get:
+      tags:
+      - product-controller
+      operationId: getAllProducts
+      parameters:
+      - name: page
+        in: query
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: size
+        in: query
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: sort
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: id
+        in: query
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: name
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: price
+        in: query
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: categoryName
+        in: query
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProductDTO'
+  /api/catalog/list:
+    get:
+      tags:
+      - category-controller
+      operationId: listCategory
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                uniqueItems: true
+                type: array
+                items:
+                  $ref: '#/components/schemas/CategoryDTO'
+  /api/product/delete/{id}:
+    delete:
+      tags:
+      - product-controller
+      operationId: deleteProduct
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductDTO'
+  /api/catalog/delete/{name}:
+    delete:
+      tags:
+      - category-controller
+      operationId: deleteCategory
+      parameters:
+      - name: name
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+components:
+  schemas:
+    CategoryDTO:
+      type: object
+      properties:
+        name:
+          type: string
+        products:
+          uniqueItems: true
+          type: array
+          items:
+            $ref: '#/components/schemas/ProductDTO'
+    ProductDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        price:
+          type: integer
+          format: int64
+        category:
+          $ref: '#/components/schemas/CategoryDTO'
+    DefaultRevisionEntity:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        timestamp:
+          type: integer
+          format: int64
+        revisionDate:
+          type: string
+          format: date-time
+    ProductHistoryDTOWrapper:
+      type: object
+      properties:
+        product:
+          $ref: '#/components/schemas/ProductDTO'
+        revEntity:
+          $ref: '#/components/schemas/DefaultRevisionEntity'
+        revType:
+          type: string
+          enum:
+          - ADD
+          - MOD
+          - DEL

@@ -21,7 +21,7 @@ public class Product {
     private Long price;
 
     @ToString.Exclude
-    @ManyToOne(cascade = {CascadeType.PERSIST,CascadeType.REMOVE})
+    @ManyToOne(cascade = {CascadeType.PERSIST,CascadeType.REFRESH})
     private Category category;
 
 

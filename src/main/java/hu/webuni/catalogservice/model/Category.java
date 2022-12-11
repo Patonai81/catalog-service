@@ -5,7 +5,9 @@ import lombok.EqualsAndHashCode;
 import org.hibernate.envers.Audited;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 
@@ -24,5 +26,6 @@ public class Category {
     @OneToMany(mappedBy = "category",cascade = CascadeType.ALL,orphanRemoval = true, fetch = FetchType.EAGER)
     @EqualsAndHashCode.Exclude
     private Set<Product> products= new HashSet<>();
+
 
 }

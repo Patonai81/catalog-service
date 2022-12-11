@@ -1,9 +1,10 @@
 package hu.webuni.catalogservice.service;
 
 import com.querydsl.core.types.Predicate;
-import hu.webuni.catalogservice.dto.ProductDTO;
 import hu.webuni.catalogservice.dto.ProductHistoryWrapper;
+import hu.webuni.catalogservice.model.Category;
 import hu.webuni.catalogservice.model.Product;
+import hu.webuni.catalogservice.repository.CategoryRepository;
 import hu.webuni.catalogservice.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,12 +30,22 @@ import java.util.stream.Collectors;
 public class ProductService {
 
     private final ProductRepository productRepository;
+    private final CategoryRepository categoryRepository;
+    private final CategoryService categoryService;
 
     @PersistenceContext
     private EntityManager entityManager;
 
     @Transactional(Transactional.TxType.REQUIRED)
     public Product createProduct(Product product){
+
+        if (product.getCategory()!= null){
+           Optional<Category> categoryOptional = categoryService.findCategory(product.getCategory().getName());
+           if (categoryOptional.isPresent()){
+               product.setCategory(categoryOptional.get());
+           }
+        }
+
        Product saved= productRepository.save(product);
        return saved;
     }
@@ -46,7 +57,12 @@ public class ProductService {
         if (!productDBOptional.isPresent())
             return null;
 
-        productRepository.deleteById(id);
+        Category category = productDBOptional.get().getCategory();
+        if (category != null) {
+            category.getProducts().remove(productDBOptional.get());
+        }else {
+            productRepository.deleteById(id);
+        }
         return productDBOptional.get();
     }
 
@@ -56,15 +72,17 @@ public class ProductService {
         Optional<Product> currentRecordOpt = productRepository.findById(productId);
         if (currentRecordOpt.isPresent()) {
             product.setId(currentRecordOpt.get().getId());
+            product.setCategory(currentRecordOpt.get().getCategory());
         }else {
             return null;
         }
-        Product result = productRepository.save(product);
+
+        Product result = productRepository.saveAndFlush(product);
         return result;
     }
 
     @Transactional
-    public List<Product> getCourses(Predicate productFilter, Pageable pageable) {
+    public List<Product> getProducts(Predicate productFilter, Pageable pageable) {
         Page<Product> course = productRepository.findAll(productFilter, pageable);
         return course.getContent();
     }
